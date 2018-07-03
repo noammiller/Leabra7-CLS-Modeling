@@ -3,4 +3,4 @@ Complementary learning system (CLS) modeling in [Daniel Greenidge's](https://git
 
 ## Getting started
 
-Follow installation instructions for users on the [leabra7 github page][https://github.com/cdgreenidge/leabra7]
+Follow installation instructions for users on the [leabra7 github page](https://github.com/cdgreenidge/leabra7)
