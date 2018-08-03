@@ -26,6 +26,7 @@ import leabra7 as lb
 num_networks = int(sys.argv[1])
 num_trials = int(sys.argv[2])
 
+
 #get_ipython().run_line_magic('matplotlib', 'inline')
 
 
@@ -415,92 +416,35 @@ def test_epoch(network: lb.Net) -> Tuple[Dict[str, torch.Tensor], Dict[str, torc
     return initial_matrix, final_matrix, initial_accuracy, final_accuracy
 
 
-
-# In[19]:
-
-
-def test(networks: List[lb.Net]) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor], float, float]:
-
-    hidden_layers: Set[str] = {"DG", "CA3", "CA1"}
-
-    im_sum: Dict[str, torch.Tensor] = dict()
-    fm_sum: Dict[str, torch.Tensor] = dict()
-
-    for layer in hidden_layers:
-        im_sum[layer] = torch.FloatTensor(8, 8).zero_()
-        fm_sum[layer] = torch.FloatTensor(8, 8).zero_()
-
-    ia_sum = 0
-    fa_sum = 0
-
-    for _, net in enumerate(networks):
-#         print(net)
-        im, fm, ia, fa = test_epoch(net)
-
-        for layer in hidden_layers:
-#             print(im[layer])
-            im_sum[layer] += im[layer]
-            fm_sum[layer] += fm[layer]
-
-        ia_sum += ia
-        fa_sum += fa
-
-    num_net = len(networks)
-
-   # print(ia_sum)
-
-    ia_sum /= num_net
-    fa_sum /= num_net
-
-    for layer in hidden_layers:
-#         print(im_sum[layer])
-        im_sum[layer] /= num_net
-        fm_sum[layer] /= num_net
-
-    return im_sum, fm_sum, ia_sum, fa_sum
-
-
 # In[15]:
 
+def assemble(name: int, seq: bool, num_trials: int):
+    net = gen_net()
+    for e in range(10):
+        train_epoch(net, seq, num_trials)
+    result = test_epoch(net)
+    print("assembly complete: "+str(name))
+    if seq:
+        pickle.dump(result, open("/tigress/noamm/nets_seq_"+str(num_networks)+"_"+str(num_trials)+"_"+str(name)+".pkl", "wb"))
+    else:
+        pickle.dump(result, open("/tigress/noamm/nets_sep_"+str(num_networks)+"_"+str(num_trials)+"_"+str(name)+".pkl", "wb"))
 
-nets_sep = [gen_net() for i in range(num_networks)]
-nets_seq = [gen_net() for i in range(num_networks)]
+q_sep = mp.JoinableQueue()
+q_seq = mp.JoinableQueue()
 
-# process_seq = [mp.Process(target = train_epoch, args = (net, True, 10, 100)) for net in nets_seq]
-# process_sep = [mp.Process(target = train_epoch, args = (net, False, 10, 100)) for net in nets_sep]
+process_sep = [mp.Process(target = assemble, args = (i, False, num_trials)) for i in range(num_networks)]
+process_seq = [mp.Process(target = assemble, args = (i, True, num_trials)) for i in range(num_networks)]
 
-for e in range(10):
-    print(e)
+print("sep")
+for process in process_sep:
+    process.start()
 
-    process_sep = [mp.Process(target = train_epoch, args = (net, False, num_trials)) for net in nets_sep]
-    process_seq = [mp.Process(target = train_epoch, args = (net, True, num_trials)) for net in nets_seq]
+print("seq")
+for process in process_seq:
+    process.start()
 
-    print("separate")
-    for p in process_sep:
-        p.start()
+for process in process_sep:
+    process.join()
 
-    print("sequence")
-    for p in process_seq:
-        p.start()
-
-    for p in process_sep:
-        p.join()
-
-    for p in process_seq:
-        p.join()
-
-    print("done")
-
-    print()
-    print()
-
-# train(nets_seq, seq = True, num_epoch = 10, num_trial = 100)
-# train(nets_sep, seq = False, num_epoch = 10, num_trial = 100)
-
-
-# In[29]:
-
-
-# _, _, x, y = test(nets_seq)
-pickle.dump(test(nets_seq), open("/tigress/noamm/nets_seq_"+str(num_networks)+"_"+str(num_trials)+".pkl", "wb"))
-pickle.dump(test(nets_sep), open("/tigress/noamm/nets_sep_"+str(num_networks)+"_"+str(num_trials)+".pkl", "wb"))
+for process in process_seq:
+    process.join()
