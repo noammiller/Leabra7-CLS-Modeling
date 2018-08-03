@@ -1,18 +1,20 @@
-#!/usr/bin/env python
+#!/bin/bash
 
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
 #SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu:4
+#SBATCH --gres=gpu:1
 #SBATCH --time=0:01:00
 
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
 #SBATCH --mail-user=noamm@princeton.edu
 
-import torch
+ /home/noamm/anaconda3/envs/leabra7/etc/profile.d/conda.sh
 
-print(torch.cuda.is_available())
-print(torch.cuda.device_count())
-print(torch.cuda.current_device())
+conda activate base
+
+cd /home/noamm/GitHub/Leabra7-CLS-Modeling/Schapiro
+
+./Schapiro_Model_GPU.py 1 1000
