@@ -8,6 +8,8 @@
 #SBATCH --mail-type=end
 #SBATCH --mail-user=noamm@princeton.edu
 
+echo "test"
+
 . /home/noamm/anaconda3/envs/leabra7/etc/profile.d/conda.sh
 
 conda activate base
