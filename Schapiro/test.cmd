@@ -11,4 +11,6 @@
 #SBATCH --mail-type=end
 #SBATCH --mail-user=noamm@princeton.edu
 
-nvidia-smi
+conda activate leabra7
+cd /home/noamm/GitHub/Leabra7-CLS-Modeling/Schapiro
+./Schapiro_Model_GPU.py
