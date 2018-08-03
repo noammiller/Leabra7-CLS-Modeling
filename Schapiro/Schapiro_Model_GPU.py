@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#SBATCH -N 20
+#SBATCH -N 3
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
 #SBATCH --cpus-per-task=4
@@ -11,7 +11,7 @@
 #SBATCH --mail-type=end
 #SBATCH --mail-user=noamm@princeton.edu
 
-num_networks = 20
+num_networks = 3
 num_trials = 1000
 
 # coding: utf-8
