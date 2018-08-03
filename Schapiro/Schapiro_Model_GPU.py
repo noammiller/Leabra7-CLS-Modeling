@@ -1,19 +1,5 @@
 #!/usr/bin/env python
 
-#SBATCH -N 1
-#SBATCH --ntasks-per-node=1
-#SBATCH --ntasks-per-socket=1
-#SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu:1
-#SBATCH --time=0:05:00
-
-#SBATCH --mail-type=begin
-#SBATCH --mail-type=end
-#SBATCH --mail-user=noamm@princeton.edu
-
-num_networks = 1
-num_trials = 1000
-
 # coding: utf-8
 
 # In[1]:
@@ -21,6 +7,7 @@ num_trials = 1000
 import math
 import pickle
 import random
+import sys
 import time
 from typing import Dict
 from typing import Tuple
@@ -36,7 +23,8 @@ torch.set_printoptions(precision = 1)
 
 import leabra7 as lb
 
-print(lb.using_cuda)
+num_networks = int(sys.argv[1])
+num_trials = int(sys.argv[2])
 
 #get_ipython().run_line_magic('matplotlib', 'inline')
 
@@ -500,6 +488,8 @@ for e in range(10):
 
     for p in process_seq:
         p.join()
+
+    print("done")
 
     print()
     print()
