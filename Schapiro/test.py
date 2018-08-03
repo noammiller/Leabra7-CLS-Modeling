@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
 #SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:4
 #SBATCH --time=0:01:00
 
 #SBATCH --mail-type=begin
@@ -14,4 +14,5 @@
 import torch
 
 print(torch.cuda.is_available())
+print(torch.cuda.device_count())
 print(torch.cuda.current_device())
