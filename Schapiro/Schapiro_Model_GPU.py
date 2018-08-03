@@ -239,7 +239,7 @@ def seq_next(prev: int) -> int:
     return random.choice(sequence_dict[prev])
 
 def tensorfy(old_num: int, new_num: int) -> torch.Tensor:
-    x = lb.cuda(torch.FloatTensor(8).zero_())
+    x = lb.cuda(torch.FloatTensor(8)).zero_()
     if new_num != None:
         x[new_num] = 1
     if old_num != None:
@@ -309,7 +309,7 @@ def net_snapshot(network: lb.Net) -> Dict[str, torch.Tensor]:
 
 def pearson_correlation(patterns: Dict[int, torch.Tensor]) -> torch.Tensor:
     dim = len(patterns.keys())
-    corr_matrix = lb.cuda(torch.FloatTensor(dim, dim).zero_())
+    corr_matrix = lb.cuda(torch.FloatTensor(dim, dim)).zero_()
 
     for i in range(dim):
         for j in range(i, dim):
@@ -439,8 +439,8 @@ def test(networks: List[lb.Net]) -> Tuple[Dict[str, torch.Tensor], Dict[str, tor
     fm_sum: Dict[str, torch.Tensor] = dict()
 
     for layer in hidden_layers:
-        im_sum[layer] = lb.cuda(torch.FloatTensor(8, 8).zero_())
-        fm_sum[layer] = lb.cuda(torch.FloatTensor(8, 8).zero_())
+        im_sum[layer] = lb.cuda(torch.FloatTensor(8, 8)).zero_()
+        fm_sum[layer] = lb.cuda(torch.FloatTensor(8, 8)).zero_()
 
     ia_sum = 0
     fa_sum = 0
