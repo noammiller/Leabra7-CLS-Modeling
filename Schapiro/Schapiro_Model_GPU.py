@@ -36,6 +36,8 @@ torch.set_printoptions(precision = 1)
 
 import leabra7 as lb
 
+print(lb.using_cuda)
+
 #get_ipython().run_line_magic('matplotlib', 'inline')
 
 
