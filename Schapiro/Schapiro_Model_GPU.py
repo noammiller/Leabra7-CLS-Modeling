@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-#SBATCH -N 10
+#SBATCH -N 1
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
-#SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:4
-#SBATCH --time=10:00:00
+#SBATCH --cpus-per-task=1
+#SBATCH --gres=gpu:1
+#SBATCH --time=0:05:00
 
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
 #SBATCH --mail-user=noamm@princeton.edu
 
-num_networks = 10
+num_networks = 1
 num_trials = 1000
 
 # coding: utf-8
