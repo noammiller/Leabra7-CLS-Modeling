@@ -425,9 +425,9 @@ def assemble(name: int, seq: bool, num_trials: int):
     result = test_epoch(net)
     print("assembly complete: "+str(name))
     if seq:
-        pickle.dump(result, open("/tigress/noamm/nets_seq_"+str(num_networks)+"_"+str(num_trials)+"_"+str(name)+".pkl", "wb"))
+        pickle.dump(result, open("/tigress/noamm/schapiro/gpu/nets_seq_"+str(num_networks)+"_"+str(num_trials)+"_"+str(name)+".pkl", "wb"))
     else:
-        pickle.dump(result, open("/tigress/noamm/nets_sep_"+str(num_networks)+"_"+str(num_trials)+"_"+str(name)+".pkl", "wb"))
+        pickle.dump(result, open("/tigress/noamm/schapiro/gpu/nets_sep_"+str(num_networks)+"_"+str(num_trials)+"_"+str(name)+".pkl", "wb"))
 
 q_sep = mp.JoinableQueue()
 q_seq = mp.JoinableQueue()
