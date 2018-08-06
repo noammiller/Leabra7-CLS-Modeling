@@ -228,7 +228,7 @@ def seq_next(prev: int) -> int:
     return random.choice(sequence_dict[prev])
 
 def tensorfy(old_num: int, new_num: int) -> torch.Tensor:
-    x = torch.FloatTensor(8).zero_()
+    x = lb.to_cuda(torch.FloatTensor(8).zero_())
     if new_num != None:
         x[new_num] = 1
     if old_num != None:
@@ -298,7 +298,7 @@ def net_snapshot(network: lb.Net) -> Dict[str, torch.Tensor]:
 
 def pearson_correlation(patterns: Dict[int, torch.Tensor]) -> torch.Tensor:
     dim = len(patterns.keys())
-    corr_matrix = torch.FloatTensor(dim, dim).zero_()
+    corr_matrix = lb.to_cuda(torch.FloatTensor(dim, dim).zero_())
 
     for i in range(dim):
         for j in range(i, dim):
