@@ -372,6 +372,7 @@ def train_epoch(network: lb.Net, seq: bool, num_trial) -> None:
         learn_trial(network, epoch_input[t], epoch_output[t])
 
     print("epoch done " + str(time.time() - startTime))
+    sys.stdout.flush()
 
 
 # In[23]:
@@ -423,12 +424,17 @@ def assemble(name: int, seq: bool, num_trials: int):
     net = gen_net()
     for e in range(10):
         train_epoch(net, seq, num_trials)
+    print("begin assembly: "+str(name))
+    sys.stdout.flush()
     result = test_epoch(net)
     print("assembly complete: "+str(name))
+    sys.stdout.flush()
     if seq:
         pickle.dump(result, open("/tigress/noamm/schapiro/cpu/nets_seq_"+str(num_networks)+"_"+str(num_trials)+"_"+str(name)+".pkl", "wb"))
     else:
         pickle.dump(result, open("/tigress/noamm/schapiro/cpu/nets_sep_"+str(num_networks)+"_"+str(num_trials)+"_"+str(name)+".pkl", "wb"))
+    print("dumped: "+str(name))
+    sys.stdout.flush()
 
 q_sep = mp.JoinableQueue()
 q_seq = mp.JoinableQueue()
@@ -449,3 +455,5 @@ for process in process_sep:
 
 for process in process_seq:
     process.join()
+
+print("all done")

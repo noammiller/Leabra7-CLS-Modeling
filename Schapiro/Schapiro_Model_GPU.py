@@ -373,6 +373,7 @@ def train_epoch(network: lb.Net, seq: bool, num_trial) -> None:
         learn_trial(network, epoch_input[t], epoch_output[t])
 
     print("epoch done: " + str(time.time() - startTime))
+    sys.stdout.flush()
 
 
 # In[23]:

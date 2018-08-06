@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH -N 1
+#SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --ntasks-per-socket=1
-#SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu:1
-#SBATCH --time=0:01:00
+#SBATCH --cpus-per-task=4
+#SBATCH --gres=gpu:2
+#SBATCH --time=12:00:00
 
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
@@ -19,4 +19,4 @@ conda activate base
 
 cd /home/noamm/GitHub/Leabra7-CLS-Modeling/Schapiro
 
-./Schapiro_Model_GPU.py 1 1000
+./Schapiro_Model.py 1 1000
