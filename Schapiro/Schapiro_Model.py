@@ -228,52 +228,47 @@ def seq_next(prev: int) -> int:
 
 def tensorfy(old_num: int, new_num: int) -> torch.Tensor:
     x = lb.to_cuda(torch.FloatTensor(8).zero_())
-    if new_num != None:
-        x[new_num] = 1
-    if old_num != None:
-        x[old_num] = 0.9
+    x[new_num] = 1
+    x[old_num] = 0.9
     return x
 
-def gen_train_seq_epoch(epoch_len) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
-    old_seed = None
-    curr_seed = random.randint(0,7)
+def gen_train_seq_epoch(epoch_len) -> List[torch.Tensor]:
+    patterns: List[torch.Tensor] = []
 
-    inputs: List[torch.Tensor] = []
-    outputs: List[torch.Tensor] = []
+    old_seed = random.randint(0,7)
+    curr_seed = seq_next(old_seed)
 
     for _ in range(epoch_len):
-        inputs += [tensorfy(old_seed, curr_seed)]
+        patterns += [tensorfy(old_seed, curr_seed)]
 
         old_seed = curr_seed
-
         curr_seed = seq_next(old_seed)
-        outputs += [tensorfy(None, curr_seed)]
 
-    return inputs, outputs
+    return patterns
 
-def gen_train_sep_epoch(epoch_len) -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
-    inputs: List[torch.Tensor] = []
-    outputs: List[torch.Tensor] = []
+def gen_train_sep_epoch(epoch_len) -> List[torch.Tensor]:
+    patterns: List[torch.Tensor] = []
 
-    for i in range(epoch_len):
-        curr_seed = random.choice([0, 2, 4, 6])
-        inputs += [tensorfy(None, curr_seed)]
-        next_seed = seq_next(curr_seed)
-        outputs += [tensorfy(None, next_seed)]
+    for _ in range(epoch_len):
+        old_seed = random.choice([0, 2, 4, 6])
+        curr_seed = seq_next(old_seed)
 
-    return inputs, outputs
+        patterns += [tensorfy(old_seed, curr_seed)]
+
+    return patterns
 
 def gen_test() -> Tuple[List[torch.Tensor], List[torch.Tensor]]:
     inputs: List[torch.Tensor] = []
     outputs: List[torch.Tensor] = []
 
     for curr_seed in range(8):
-        inputs += [tensorfy(None, curr_seed)]
-        if curr_seed in {0, 2, 4, 6}:
-            next_seed = seq_next(curr_seed)
+        if curr_seed%2 == 0:
+            next_seed = curr_seed + 1
         else:
-            next_seed = None
-        outputs += [tensorfy(None, next_seed)]
+            next_seed = curr_seed - 1
+
+        inputs += [tensorfy(None, curr_seed)]
+        outputs += [tensorfy(curr_seed, next_seed)]
 
     return inputs, outputs
 
@@ -312,24 +307,24 @@ def pearson_correlation(patterns: Dict[int, torch.Tensor]) -> torch.Tensor:
 # In[10]:
 
 
-def learn_trial(network: lb.Net, input_pattern = torch.Tensor, output_pattern = torch.Tensor) -> None:
+def learn_trial(network: lb.Net, pattern = torch.Tensor) -> None:
     # Theta Trough
-    network.clamp_layer("Input", input_pattern)
-    network.uninhibit_projns("MSP: EC_in -> CA1")
+    network.clamp_layer("Input", pattern)
     network.inhibit_projns("TSP: CA3 -> CA1", "Loop: EC_out -> EC_in")
     network.phase_cycle(ThetaTrough, num_cycles = 20)
+    network.uninhibit_projns("TSP: CA3 -> CA1", "Loop: EC_out -> EC_in")
+
     # Theta Peak
-    network.uninhibit_projns("TSP: CA3 -> CA1")
     network.inhibit_projns("MSP: EC_in -> CA1", "Loop: EC_out -> EC_in")
     network.phase_cycle(ThetaPeak, num_cycles = 20)
-    # Theta Plus
     network.uninhibit_projns("MSP: EC_in -> CA1", "Loop: EC_out -> EC_in")
+    # Theta Plus
+    network.clamp_layer("EC_out", pattern)
     network.inhibit_projns("TSP: CA3 -> CA1")
-    network.clamp_layer("EC_out", output_pattern)
     network.phase_cycle(ThetaPlus, num_cycles = 60)
+    network.inhibit_projns("TSP: CA3 -> CA1")
     # Reset
-    network.uninhibit_projns("TSP: CA3 -> CA1")
-    network.unclamp_layer("EC_in", "EC_out")
+    network.unclamp_layer("Input", "EC_out")
     network.end_trial()
     network.learn()
 
@@ -364,12 +359,12 @@ def test_trial(network: lb.Net, input_pattern = torch.Tensor, output_pattern = t
 def train_epoch(network: lb.Net, seq: bool, num_trial) -> None:
     startTime = time.time()
     if seq:
-        epoch_input, epoch_output = gen_train_seq_epoch(num_trial)
+        epoch_pattern = gen_train_seq_epoch(num_trial)
     else:
-        epoch_input, epoch_output = gen_train_sep_epoch(num_trial)
+        epoch_pattern = gen_train_sep_epoch(num_trial)
 
-    for t in range(len(epoch_input)):
-        learn_trial(network, epoch_input[t], epoch_output[t])
+    for t in range(num_trial):
+        learn_trial(network, epoch_pattern[t])
 
     print("epoch done " + str(time.time() - startTime))
     sys.stdout.flush()
