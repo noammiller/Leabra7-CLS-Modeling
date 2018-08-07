@@ -344,7 +344,9 @@ def test_trial(network: lb.Net, input_pattern = torch.Tensor, output_pattern = t
     network.phase_cycle(TestPhase, num_cycles = 20)
 
     initial_response = net_snapshot(network)
-#    print(initial_response["EC_out"])
+    print(type(initial_response["EC_out"]))
+    print(type(output_pattern.byte()))
+    sys.stdout.flush()
     initial_guess = ((initial_response["EC_out"] > 0.5) == output_pattern.byte()).all()
 
     # Final Response
